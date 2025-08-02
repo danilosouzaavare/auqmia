@@ -1,0 +1,12 @@
+asgiref==3.9.1
+Django==5.2.4
+django-crispy-forms==2.4
+django-debug-toolbar==5.2.0
+sqlparse==0.5.3
+gunicorn
+whitenoise
+dj-database-url
+django
+psycopg2-binary
+pip install gunicorn whitenoise dj-database-url psycopg2-binary
+pip freeze > requirements.txt

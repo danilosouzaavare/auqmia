@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: meu-site-django
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py migrate
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn NOME_DO_PROJETO.wsgi
+    plan: free
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: NOME_DO_PROJETO.settings
+      - key: SECRET_KEY
+        sync: false
+      - key: DEBUG
+        value: False
