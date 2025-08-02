@@ -1,0 +1,15 @@
+
+crie um models.py
+de clientes onde contenham 
+
+nome
+sobre_nome
+endereço
+cidade
+CEP
+telefone
+telefone_2
+email
+
+e esse cliente pode conter varios cachorros
+

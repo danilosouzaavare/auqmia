@@ -1,0 +1,129 @@
+.form-wrapper {
+    max-width: 900px;
+    /* largura máxima para não ficar gigante na tela */
+    margin: 20px auto;
+    /* centraliza horizontalmente e dá um espaço vertical */
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    /* fundo branco */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1,
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+input[type="text"],
+input[type="number"],
+.search-input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.produtos-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.produtos-table thead tr {
+    background-color: #2e7d32;
+    /* verde escuro */
+    color: #fff;
+}
+
+.produtos-table tbody tr {
+    background-color: #e8f5e9;
+    /* verde claro */
+}
+
+.produtos-table tbody tr:nth-child(even) {
+    background-color: #c8e6c9;
+    /* verde claro alternado */
+}
+
+.produtos-table th,
+.produtos-table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+    box-sizing: border-box;
+    max-width: 150px;
+    word-wrap: break-word;
+}
+
+.btn,
+.btn-delete {
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover,
+.btn-delete:hover {
+    background-color: #276629;
+}
+
+.resultados-lista {
+    list-style: none;
+    padding: 0;
+    margin: 2px 0 0 0;
+    border: 1px solid #ccc;
+    max-height: 140px;
+    overflow-y: auto;
+    background-color: white;
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+    box-sizing: border-box;
+    border-radius: 4px;
+}
+
+.resultados-lista li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.resultados-lista li:hover {
+    background-color: #ff002b;
+    /* verde mais claro no hover */
+}
+
+/* Garante que o container do autocomplete tenha posição relativa para posicionar lista */
+.form-group {
+    position: relative;
+}
+
+/* Para inputs da tabela */
+.produto-nome {
+    width: 100%;
+    padding: 6px 8px;
+    box-sizing: border-box;
+}
+
+.produto-quantidade,
+.produto-preco,
+.produto-subtotal {
+    width: 100px;
+    text-align: center;
+    padding: 6px 8px;
+    box-sizing: border-box;
+}

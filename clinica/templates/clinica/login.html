@@ -1,0 +1,38 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login - AuQmia</title>
+    <link rel="stylesheet" href="{% static 'global/css/style.css' %}">
+</head>
+
+<body>
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <div class="login-box">
+            <img src="{% static 'img/logo.png' %}" alt="Logo AuQmia" class="logo">
+            <h2>Sistema AuQmia</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="botao">Entrar</button>
+
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="atendimento-container">
+    <h2 class="text-center mb-4">Atendimento Clínico - {{ animal.nome }}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <ul class="nav nav-tabs" id="tabs">
+            <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#dados">Dados Clínicos</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#vacinas">Vacinas Aplicadas</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#final">Finalização</a></li>
+        </ul>
+
+        <div class="tab-content p-3 border border-top-0 bg-white rounded shadow-sm">
+            <div class="tab-pane fade show active" id="dados">
+                {{ form.anamnese.label }} {{ form.anamnese }}
+                {{ form.sintomas.label }} {{ form.sintomas }}
+                {{ form.diagnostico.label }} {{ form.diagnostico }}
+                {{ form.tratamento.label }} {{ form.tratamento }}
+                {{ form.exames_solicitados.label }} {{ form.exames_solicitados }}
+            </div>
+            <div class="tab-pane fade" id="vacinas">
+                {{ formset.management_form }}
+                {% for form in formset %}
+                <div class="card my-2 p-2">
+                    {{ form.vacina.label }} {{ form.vacina }}
+                    {{ form.dosagem.label }} {{ form.dosagem }}
+                    {{ form.observacoes.label }} {{ form.observacoes }}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="tab-pane fade" id="final">
+                {{ form.orientacoes_ao_tutor.label }} {{ form.orientacoes_ao_tutor }}
+                {{ form.retorno_recomendado.label }} {{ form.retorno_recomendado }}
+                {{ form.data_retorno.label }} {{ form.data_retorno }}
+                {{ form.venda_gerada.label }} {{ form.venda_gerada }}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Salvar Atendimento</button>
+    </form>
+</div>
+{% endblock %}

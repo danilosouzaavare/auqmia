@@ -1,0 +1,35 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+  <!-- FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+  <h1>Calendário - Agendamentos</h1>
+  <div id="calendar"></div>
+{% endblock %}
+
+{% block extra_scripts %}
+  <!-- FullCalendar JS -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var calendarEl = document.getElementById('calendar');
+
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek',
+        },
+        events: '/api/agendamentos/',
+      });
+
+      calendar.render();
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calendário Teste FullCalendar</title>
+
+  <!-- CSS do FullCalendar -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+
+  <!-- JS do FullCalendar -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      margin: 20px;
+      text-align: center;
+    }
+    #calendar {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Calendário Teste FullCalendar</h1>
+  <div id="calendar"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log("Iniciando o calendário");
+
+      const calendarEl = document.getElementById('calendar');
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+        events: [
+          { title: 'Evento 1', start: '2025-07-25' },
+          { title: 'Evento 2', start: '2025-07-26', color: 'green' },
+          { title: 'Evento 3', start: '2025-07-27', color: 'red' }
+        ]
+      });
+
+      calendar.render();
+
+      console.log("Calendário renderizado");
+    });
+  </script>
+</body>
+</html>

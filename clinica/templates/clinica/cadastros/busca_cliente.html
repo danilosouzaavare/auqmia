@@ -1,0 +1,69 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'global/css/venda.css' %}">
+
+<div class="form-wrapper">
+    <h1>Nova Venda</h1>
+
+    <form method="post" action="{% url 'clinica:salvar_venda' %}">
+        {% csrf_token %}
+
+        <!-- Campo de busca por cliente -->
+        <div class="form-group">
+            <label for="busca-cliente">Cliente</label>
+            <input type="text" id="busca-cliente" class="search-input" autocomplete="off"
+                placeholder="Digite o nome...">
+            <ul id="resultados"></ul>
+            <input type="hidden" name="cliente_id" id="cliente-id">
+        </div>
+
+        <!-- Descrição -->
+        <div class="form-group">
+            <label for="descricao">Descrição</label>
+            <input type="text" name="descricao" id="descricao">
+        </div>
+
+        <!-- Botão -->
+        <button type="submit" class="btn">Salvar Venda</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#busca-cliente').keyup(function () {
+            var termo = $(this).val();
+            if (termo.length > 1) {
+                $.ajax({
+                    url: '{% url "clinica:buscar_clientes" %}',
+                    data: { q: termo },
+                    success: function (data) {
+                        var lista = $('#resultados');
+                        lista.empty();
+                        if (data.length === 0) {
+                            lista.append('<li>Nenhum cliente encontrado</li>');
+                        } else {
+                            data.forEach(function (cliente) {
+                                lista.append('<li data-id="' + cliente.id + '">' + cliente.nome + '</li>');
+                            });
+                        }
+                    }
+                });
+            } else {
+                $('#resultados').empty();
+            }
+        });
+
+        $('#resultados').on('click', 'li', function () {
+            var nome = $(this).text();
+            var id = $(this).data('id');
+
+            $('#busca-cliente').val(nome);
+            $('#cliente-id').val(id);
+            $('#resultados').empty();
+        });
+    });
+</script>
+{% endblock %}

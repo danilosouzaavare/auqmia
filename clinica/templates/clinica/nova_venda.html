@@ -1,0 +1,310 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'clinica/venda.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+<div class="container py-4 venda-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <h1 class="mb-4 venda-titulo">Nova Venda - Clínica Veterinária</h1>
+            <form method="post" action="{% url 'clinica:salvar_venda' %}">
+                {% csrf_token %}
+
+                <!-- Tutor -->
+                <div class="mb-3 position-relative">
+                    <label for="busca-tutor" class="form-label">Tutor</label>
+                    <input type="text" id="busca-tutor" class="form-control" autocomplete="off"
+                        placeholder="Buscar tutor...">
+                    <input type="hidden" name="tutor_id" id="tutor-id">
+                    <ul id="resultados-tutores" class="list-group position-absolute w-100"></ul>
+                    <div class="form-text">
+                        <a href="{% url 'clinica:cadastro_cliente' %}">Cadastrar novo tutor</a>
+                    </div>
+                </div>
+
+                <!-- Animal -->
+                <div class="mb-3 position-relative">
+                    <label for="busca-animal" class="form-label">Animal</label>
+                    <input type="text" id="busca-animal" class="form-control" autocomplete="off"
+                        placeholder="Buscar animal...">
+                    <input type="hidden" name="animal_id" id="animal-id">
+                    <ul id="resultados-animais" class="list-group position-absolute w-100"></ul>
+                    <div class="form-text">
+                        <a href="{% url 'clinica:cadastro_animal' %}">Cadastrar novo animal</a>
+                    </div>
+                </div>
+
+                <!-- Observações clínicas -->
+                <div class="mb-3">
+                    <label for="descricao" class="form-label">Observações clínicas</label>
+                    <textarea name="descricao" id="descricao" rows="2" class="form-control"></textarea>
+                </div>
+
+                <hr>
+
+                <!-- Busca de produto/serviço -->
+                <div class="mb-3 position-relative">
+                    <label for="search-item" class="form-label">Buscar Produto/Serviço</label>
+                    <input type="text" id="search-item" class="form-control" autocomplete="off"
+                        placeholder="Digite o nome do produto ou serviço...">
+                    <ul id="resultados-search-item" class="list-group position-absolute w-100"></ul>
+                </div>
+
+                <!-- Itens adicionados -->
+                <h2 class="mt-4 mb-3">Itens da Venda</h2>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead>
+                            <tr class="table-secondary">
+                                <th>Produto/Serviço</th>
+                                <th>Quantidade</th>
+                                <th>Preço Unitário</th>
+                                <th>Subtotal</th>
+                                <th>Remover</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itens-corpo"></tbody>
+                    </table>
+                </div>
+
+                <!-- Desconto, acréscimo, total -->
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label for="desconto" class="form-label">Desconto (R$)</label>
+                        <input type="number" step="0.01" min="0" id="desconto" name="desconto" class="form-control"
+                            value="0.00">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="acrescimo" class="form-label">Acréscimo (R$)</label>
+                        <input type="number" step="0.01" min="0" id="acrescimo" name="acrescimo" class="form-control"
+                            value="0.00">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <label class="me-2 fw-bold">Total:</label>
+                        <input type="text" id="total-venda" class="form-control w-auto" readonly value="0,00">
+                    </div>
+                </div>
+
+                <!-- Pagamento -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="forma-pagamento" class="form-label">Forma de pagamento</label>
+                        <select name="forma_pagamento" id="forma-pagamento" class="form-select">
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="cartao">Cartão</option>
+                            <option value="pix">Pix</option>
+                            <option value="boleto">Boleto</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="valor-recebido" class="form-label">Valor recebido (R$)</label>
+                        <input type="number" step="0.01" min="0" id="valor-recebido" name="valor_recebido"
+                            class="form-control" value="0.00">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <label class="me-2 fw-bold">Troco:</label>
+                        <input type="text" id="troco" class="form-control w-auto" readonly value="0,00">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Finalizar Venda</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function () {
+        // Tutor autocomplete
+        $('#busca-tutor').on('keyup', function () {
+            let termo = $(this).val();
+            let lista = $('#resultados-tutores');
+            lista.empty().hide();
+            if (termo.length < 2) return;
+            $.getJSON("{% url 'clinica:buscar_tutores' %}", { q: termo }, function (data) {
+                if (data.length === 0) {
+                    lista.append('<li class="list-group-item">Nenhum tutor encontrado</li>').show();
+                } else {
+                    data.forEach(function (tutor) {
+                        lista.append('<li class="list-group-item list-group-item-action" data-id="' + tutor.id + '">' + tutor.nome + '</li>');
+                    });
+                    lista.show();
+                }
+            });
+        });
+
+        $('#resultados-tutores').on('mousedown', 'li', function (e) {
+            e.preventDefault();
+            let nome = $(this).text();
+            let id = $(this).data('id');
+            $('#busca-tutor').val(nome);
+            $('#tutor-id').val(id);
+            $('#resultados-tutores').empty().hide();
+            $('#busca-animal').val('');
+            $('#animal-id').val('');
+        });
+
+        // Animal autocomplete (só mostra animais do tutor selecionado)
+        $('#busca-animal').on('keyup', function () {
+            let termo = $(this).val();
+            let tutor_id = $('#tutor-id').val();
+            let lista = $('#resultados-animais');
+            lista.empty().hide();
+            if (termo.length < 1 || !tutor_id) return;
+            $.getJSON("{% url 'clinica:buscar_animais' %}", { q: termo, tutor_id: tutor_id }, function (data) {
+                if (data.length === 0) {
+                    lista.append('<li class="list-group-item">Nenhum animal encontrado</li>').show();
+                } else {
+                    data.forEach(function (animal) {
+                        lista.append('<li class="list-group-item list-group-item-action" data-id="' + animal.id + '">' + animal.nome + (animal.especie ? " (" + animal.especie + ")" : "") + '</li>');
+                    });
+                    lista.show();
+                }
+            });
+        });
+
+        $('#resultados-animais').on('mousedown', 'li', function (e) {
+            e.preventDefault();
+            let nome = $(this).text();
+            let id = $(this).data('id');
+            $('#busca-animal').val(nome);
+            $('#animal-id').val(id);
+            $('#resultados-animais').empty().hide();
+        });
+
+        // Busca produto/serviço
+        $('#search-item').on('keyup', function () {
+            const termo = $(this).val();
+            const lista = $('#resultados-search-item');
+            lista.empty().hide();
+            if (termo.length < 2) return;
+            $.getJSON("{% url 'clinica:buscar_produtos' %}", { q: termo }, function (data) {
+                if (data.length === 0) {
+                    lista.append('<li class="list-group-item">Nenhum produto/serviço encontrado</li>').show();
+                } else {
+                    data.forEach(function (item) {
+                        lista.append(
+                            '<li class="list-group-item list-group-item-action" ' +
+                            'data-id="' + item.id + '" data-nome="' + item.nome + '" data-preco="' + item.preco + '">' +
+                            item.nome + (item.tipo === 'servico' ? ' [Serviço]' : ' [Produto]') + '</li>'
+                        );
+                    });
+                    lista.show();
+                }
+            });
+        });
+
+        // Adiciona produto/serviço à lista
+        $('#resultados-search-item').on('mousedown', 'li', function (e) {
+            e.preventDefault();
+
+            // Verifica se tutor e animal foram selecionados
+            if (!$('#tutor-id').val()) {
+                alert('Selecione um tutor antes de adicionar itens!');
+                $('#search-item').val('');
+                $(this).parent().empty().hide();
+                $('#busca-tutor').focus();
+                return;
+            }
+            if (!$('#animal-id').val()) {
+                alert('Selecione um animal antes de adicionar itens!');
+                $('#search-item').val('');
+                $(this).parent().empty().hide();
+                $('#busca-animal').focus();
+                return;
+            }
+
+            const li = $(this);
+            const nome = li.data('nome');
+            const id = li.data('id');
+            const preco = li.data('preco');
+
+            // Verifica se já está na lista (por ID)
+            let jaExiste = false;
+            $('#itens-corpo input[name="itens_id[]"]').each(function () {
+                if ($(this).val() == id) jaExiste = true;
+            });
+            if (jaExiste) {
+                alert('Este item já foi adicionado!');
+                $('#search-item').val('');
+                li.parent().empty().hide();
+                return;
+            }
+
+            // Adiciona à lista de itens (quantidade decimal)
+            const linha = `
+        <tr>
+            <td>
+                <input type="hidden" name="itens_id[]" value="${id}">
+                <span>${nome}</span>
+            </td>
+            <td><input type="number" name="itens_quantidade[]" class="form-control item-quantidade" min="0.01" step="0.01" value="1" /></td>
+            <td><input type="text" class="form-control item-preco" readonly value="${preco.replace('.', ',')}" /></td>
+            <td><input type="text" class="form-control item-subtotal" readonly value="${preco.replace('.', ',')}" /></td>
+            <td><button type="button" class="btn btn-danger remover-item">Remover</button></td>
+        </tr>`;
+            $('#itens-corpo').append(linha);
+
+            $('#search-item').val('');
+            li.parent().empty().hide();
+
+            calcularTotal();
+        });
+
+        // Remover item
+        $('#itens-corpo').on('click', '.remover-item', function () {
+            $(this).closest('tr').remove();
+            calcularTotal();
+        });
+
+        // Atualiza subtotal ao alterar quantidade (decimais)
+        $('#itens-corpo').on('input', '.item-quantidade', function () {
+            const linha = $(this).closest('tr');
+            const qtd = parseFloat($(this).val()) || 0;
+            const precoStr = linha.find('.item-preco').val().replace(',', '.');
+            const preco = parseFloat(precoStr) || 0;
+            const subtotal = (qtd * preco).toFixed(2);
+            linha.find('.item-subtotal').val(subtotal.replace('.', ','));
+            calcularTotal();
+        });
+
+        // Desconto/acréscimo
+        $('#desconto, #acrescimo').on('input', function () {
+            calcularTotal();
+        });
+
+        // Calcula total e troco
+        function calcularTotal() {
+            let total = 0;
+            $('.item-subtotal').each(function () {
+                let valStr = $(this).val().replace(',', '.');
+                let val = parseFloat(valStr) || 0;
+                total += val;
+            });
+            let desconto = parseFloat($('#desconto').val().replace(',', '.')) || 0;
+            let acrescimo = parseFloat($('#acrescimo').val().replace(',', '.')) || 0;
+            let final = total - desconto + acrescimo;
+            if (final < 0) final = 0;
+            $('#total-venda').val(final.toFixed(2).replace('.', ','));
+
+            // Troco
+            let recebido = parseFloat($('#valor-recebido').val().replace(',', '.')) || 0;
+            let troco = recebido - final;
+            $('#troco').val(troco > 0 ? troco.toFixed(2).replace('.', ',') : '0,00');
+        }
+
+        // Troco ao alterar valor recebido
+        $('#valor-recebido').on('input', function () {
+            calcularTotal();
+        });
+
+        <a href="{% url 'clinica:atendimento_novo' animal_id %}" class="btn btn-primary">
+            Iniciar Atendimento
+        </a>
+    });
+</script>
+{% endblock %}
