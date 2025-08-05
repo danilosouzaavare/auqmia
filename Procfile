@@ -1,1 +1,1 @@
-web: gunicorn AUQMIA.wsgi
+web: gunicorn project.wsgi
