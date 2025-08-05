@@ -110,7 +110,8 @@ DATABASES = {
     # }
 
 
-    'default': dj_database_url.config(default=os.environ['postgresql://auqmia_user:GftOsbmhO4E4gidy5Kxaujmt0XaOvskq@dpg-d277f0u3jp1c73eitqj0-a/auqmia'])
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+
 }
 
 
