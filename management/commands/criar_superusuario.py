@@ -7,9 +7,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         User = get_user_model()
-        username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'danilosouza')
-        email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'danilosouzaavare@gmail.com')
-        password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'Danilo0012!')
+        username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
+        email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@example.com')
+        password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin123')
 
         if not User.objects.filter(username=username).exists():
             User.objects.create_superuser(username=username, email=email, password=password)
