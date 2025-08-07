@@ -38,6 +38,7 @@ urlpatterns = [
     path('atendimento/novo/<int:animal_id>/', views.atendimento_novo, name='atendimento_novo'),
     path('ajax/buscar-animais-atendimento/', views.buscar_animais_para_atendimento, name='buscar_animais_para_atendimento'),
     path('atendimento/selecionar/', TemplateView.as_view(template_name='clinica/selecionar_animal.html'), name='selecionar_animal'),
+    path("buscar_veterinarios/", views.buscar_veterinarios, name="buscar_veterinarios"),
 
 ]
 

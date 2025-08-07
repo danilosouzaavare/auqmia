@@ -111,7 +111,6 @@ class ProdutoServico(models.Model):
         ('servico', 'Serviço'),
         ('vacina', 'Vacina'),
     )
-
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
     preco = models.DecimalField(max_digits=10, decimal_places=2)
@@ -125,6 +124,11 @@ class ProdutoServico(models.Model):
     def tipo_legivel(self):
         return f"{self.nome} ({self.get_tipo_display()})"
 
+    def __str__(self):
+        # Se quiser só o nome:
+        # return self.nome
+        # Se quiser "Nome (Vacina/Serviço/Produto)":
+        return self.tipo_legivel
 
 
 class Agendamento(models.Model):

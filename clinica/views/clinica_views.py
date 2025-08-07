@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
-from clinica.models import Venda, ItemVenda, ProdutoServico, Cliente, Animal
+from clinica.models import Venda, ItemVenda, ProdutoServico, Cliente, Animal, Veterinario
 from django.views.decorators.http import require_GET
 
 
@@ -300,3 +300,22 @@ def logout_view(request):
     auth.logout(request)
     messages.success(request, 'Logout realizado com sucesso!')
     return redirect('clinica:login')
+
+
+
+
+
+
+def buscar_veterinarios(request):
+    animal_id = request.GET.get("animal_id")
+    # por enquanto, regra simples: todos ativos
+    qs = Veterinario.objects.filter(ativo=True).order_by("nome")
+    # se quiser filtrar por espécie do animal no futuro, você tem animal.especie disponível aqui
+    # try:
+    #     animal = Animal.objects.get(pk=animal_id)
+    #     qs = qs.filter(especialidade__icontains=animal.especie.nome)
+    # except (Animal.DoesNotExist, AttributeError, TypeError):
+    #     pass
+
+    data = [{"id": v.id, "nome": v.nome} for v in qs]  # mostra só o nome
+    return JsonResponse({"veterinarios": data})

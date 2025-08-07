@@ -1,59 +1,57 @@
-
 {% extends 'global/base.html' %}
 {% load static %}
 
 {% block content %}
+<div class="lista-wrapper">
+  <h1>Agendamentos</h1>
 
-
-
-
-{% load static %}
-
-
-  <div class="lista-wrapper">
-    <h1>Agendamentos</h1>
-    
-    <div class="responsive-table">
-      <table class="agendamentos-table">
-        <thead>
-          <tr>
-            <th>Data e Hora</th>
-            <th>Animal</th>
-            <th>Veterinário</th>
-            <th>Tipo</th>
-            <th>Status</th>
-            <th>Observações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% if agendamentos %}
-            {% for agendamento in agendamentos %}
-              <tr class="{% if agendamento.status == 'cancelado' %}status-cancelado
+  <div class="responsive-table">
+    <table class="agendamentos-table">
+      <thead>
+        <tr>
+          <th>Data e Hora</th>
+          <th>Animal</th>
+          <th>Veterinário</th>
+          <th>Tipo</th>
+          <th>Status</th>
+          <th>Observações</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if agendamentos %}
+        {% for agendamento in agendamentos %}
+        <tr class="{% if agendamento.status == 'cancelado' %}status-cancelado
                          {% elif agendamento.status == 'agendado' %}status-agendado
                          {% elif agendamento.status == 'concluido' %}status-concluido
                          {% endif %}">
-                <td>{{ agendamento.data_hora|date:"d/m/Y H:i" }}</td>
-                <td>{{ agendamento.animal.nome }}</td>
-                <td>{{ agendamento.veterinario.nome }}</td>
-                <td>{{ agendamento.get_tipo_display }}</td>
-                <td>{{ agendamento.get_status_display }}</td>
-                <td class="observacoes">{{ agendamento.observacoes|default:"-" }}</td>
-              </tr>
-            {% endfor %}
-          {% else %}
-            <tr>
-              <td colspan="6" class="sem-agendamentos">Nenhum agendamento encontrado.</td>
-            </tr>
-          {% endif %}
-        </tbody>
-      </table>
-    </div>
+          <td>{{ agendamento.data_hora|date:"d/m/Y H:i" }}</td>
+          <td>{{ agendamento.animal.nome }}</td>
+          <td>{{ agendamento.veterinario.nome|default:"-" }}</td>
+          <td>{{ agendamento.get_tipo_display }}</td>
+          <td>{{ agendamento.get_status_display }}</td>
+          <td class="observacoes">{{ agendamento.observacoes|default:"-" }}</td>
+          <td>
+            {% if agendamento.status == 'agendado' and agendamento.veterinario_id %}
+            <a class="btn btn-success btn-xs btn-criar-consulta"
+              href="/atendimento/novo/{{ agendamento.animal_id }}/?vet={{ agendamento.veterinario_id }}&agendamento={{ agendamento.id }}">
+              Criar
+            </a>
+            {% else %}
+            <button class="btn btn-sm btn-secondary" disabled>
+              Consulta Cancelada
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+          <td colspan="7" class="sem-agendamentos">Nenhum agendamento encontrado.</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
   </div>
-
-</body>
-</html>
-
-
+</div>
 {% endblock content %}
-
-

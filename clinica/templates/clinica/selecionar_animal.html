@@ -9,21 +9,73 @@
     <input type="text" id="busca-animal" class="form-control" placeholder="Digite o nome do animal ou tutor">
 </div>
 
+<div id="animal-selecionado" class="alert alert-info d-none" style="margin-top:.75rem;">
+    <strong>Animal selecionado:</strong> <span id="animal-nome"></span>
+</div>
+
+<div class="form-group" style="margin-top:1rem;">
+    <label for="veterinarioSelect">Veterinário:</label>
+    <select id="veterinarioSelect" class="form-control" disabled>
+        <option value="">Selecione um animal primeiro</option>
+    </select>
+</div>
+
+<button id="continuarBtn" class="btn btn-primary" disabled>Continuar</button>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
 <script>
-    $(function () {
+    (function () {
+        let animalId = null;
+
+        function carregarVeterinarios(idAnimal) {
+            const $vet = $('#veterinarioSelect');
+            $vet.prop('disabled', true).html('<option>Carregando...</option>');
+            $('#continuarBtn').prop('disabled', true);
+
+            $.getJSON("{% url 'clinica:buscar_veterinarios' %}", { animal_id: idAnimal })
+                .done(function (resp) {
+                    const lista = (resp && resp.veterinarios) || [];
+                    if (!lista.length) {
+                        $vet.html('<option>Nenhum veterinário disponível</option>');
+                        return;
+                    }
+                    $vet.html('<option value="">-- Selecione --</option>');
+                    lista.forEach(v => $vet.append(`<option value="${v.id}">${v.nome}</option>`));
+                    $vet.prop('disabled', false);
+                })
+                .fail(function () {
+                    $vet.html('<option>Erro ao carregar veterinários</option>');
+                });
+        }
+
         $("#busca-animal").autocomplete({
             source: "{% url 'clinica:buscar_animais_para_atendimento' %}",
             minLength: 2,
             select: function (event, ui) {
                 if (ui.item && ui.item.id) {
-                    window.location.href = "/atendimento/novo/" + ui.item.id + "/";
+                    animalId = ui.item.id;
+                    $('#animal-nome').text(ui.item.label || ui.item.value || '(sem nome)');
+                    $('#animal-selecionado').removeClass('d-none');
+                    carregarVeterinarios(animalId);
                 }
+                return false; // NÃO redireciona
             }
         });
-    });
+
+        $('#veterinarioSelect').on('change', function () {
+            $('#continuarBtn').prop('disabled', !(animalId && $(this).val()));
+        });
+
+        $('#continuarBtn').on('click', function () {
+            const vetId = $('#veterinarioSelect').val();
+            if (!animalId || !vetId) return;
+            // redireciona para sua view de atendimento
+            // se sua URL atual é /atendimento/novo/<animal_id>/, você pode mandar os dois por querystring:
+            window.location.href = "/atendimento/novo/" + animalId + "/?vet=" + vetId;
+        });
+    })();
 </script>
 {% endblock %}

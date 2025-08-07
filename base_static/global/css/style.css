@@ -981,3 +981,20 @@ button[type="submit"] {
   padding: 1rem;
   margin-bottom: 1rem;
 }
+
+
+
+.btn-criar-consulta {
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  /* deixa a fonte menor */
+  line-height: 1.2;
+}
+
+.btn.btn-sm.btn-secondary {
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  background-color: #8a1f1f;
+  /* deixa a fonte menor */
+  line-height: 1.2;
+}
