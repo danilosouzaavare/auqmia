@@ -20,6 +20,7 @@ from django.urls import include, path
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.conf import settings
 from django.conf.urls.static import static
+from django.urls import path, include
 
 app_name = 'clinica'
 
@@ -29,6 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('pedido/', include('pedido.urls')),
     path('usuario/', include('usuario.urls')),
+    path("", include(("clinica.urls", "clinica"), namespace="clinica")),
 ]
 
 if settings.DEBUG:
@@ -39,6 +41,9 @@ if settings.DEBUG:
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+
 
 # TODO: Remove debug_toolbar in production
 

@@ -1,0 +1,314 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+  <h1>Nova Venda</h1>
+
+  {# mensagens django #}
+  {% if messages %}
+    <div class="mb-4">
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form id="form-venda" method="post" action=".">
+    {% csrf_token %}
+
+    <!-- ===================== TUTOR & ANIMAL ===================== -->
+    <section class="card">
+      <h2>Cliente e Animal</h2>
+
+      <div class="grid grid-2">
+        <div>
+          <label for="tutor-input">Tutor</label>
+          <input type="text" id="tutor-input" placeholder="Digite para buscar o tutor..." autocomplete="off">
+          <div id="tutor-suggestions" class="suggestions"></div>
+
+          <!-- dados do tutor selecionado -->
+          <input type="hidden" id="tutor-id" name="tutor_id">
+          <small id="tutor-selecionado" class="muted"></small>
+        </div>
+
+        <div>
+          <label for="animal-input">Animal</label>
+          <input type="text" id="animal-input" placeholder="Selecione primeiro o tutor..." autocomplete="off" disabled>
+          <div id="animal-suggestions" class="suggestions"></div>
+
+          <!-- dados do animal selecionado -->
+          <input type="hidden" id="animal-id" name="animal_id">
+          <small id="animal-selecionado" class="muted"></small>
+        </div>
+      </div>
+
+      <!-- Botões de ações do atendimento -->
+      <div class="actions mt-2">
+        <button type="button" id="btn-iniciar-atendimento" class="btn btn-primary" disabled>
+          Iniciar Atendimento
+        </button>
+
+        <!-- URL base do atendimento com placeholder 0 (evita NoReverseMatch) -->
+        <input type="hidden" id="atendimento-url-base" value="{% url 'clinica:atendimento_novo' 0 %}">
+      </div>
+    </section>
+
+    <!-- ===================== BUSCA DE PRODUTOS/SERVIÇOS ===================== -->
+    <section class="card">
+      <h2>Produtos & Serviços</h2>
+
+      <div class="grid grid-3">
+        <div>
+          <label for="busca-item">Buscar item</label>
+          <input type="text" id="busca-item" placeholder="Nome do produto/serviço" autocomplete="off">
+          <div id="item-suggestions" class="suggestions"></div>
+        </div>
+        <div>
+          <label for="quantidade-item">Quantidade</label>
+          <input type="number" id="quantidade-item" min="1" step="1" value="1">
+        </div>
+        <div class="align-end">
+          <button type="button" id="adicionar-item" class="btn">Adicionar</button>
+        </div>
+      </div>
+
+      <div class="responsive-table mt-2">
+        <table id="tabela-itens" class="table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Tipo</th>
+              <th>Qtd</th>
+              <th>Preço (R$)</th>
+              <th>Subtotal (R$)</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- itens dinâmicos -->
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" class="right"><strong>Total (R$)</strong></td>
+              <td colspan="2">
+                <input type="text" id="total-geral" value="0,00" readonly>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="4" class="right">Desconto (R$)</td>
+              <td colspan="2">
+                <input type="text" id="desconto" value="0,00" inputmode="decimal">
+              </td>
+            </tr>
+            <tr>
+              <td colspan="4" class="right"><strong>Final (R$)</strong></td>
+              <td colspan="2">
+                <input type="text" id="total-final" value="0,00" readonly>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="4" class="right">Valor Recebido (R$)</td>
+              <td colspan="2">
+                <input type="text" id="valor-recebido" value="0,00" inputmode="decimal">
+              </td>
+            </tr>
+            <tr>
+              <td colspan="4" class="right">Troco (R$)</td>
+              <td colspan="2">
+                <input type="text" id="troco" value="0,00" readonly>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== AÇÕES FINAIS ===================== -->
+    <section class="actions mt-3">
+      <button type="submit" class="btn btn-success">Finalizar Venda</button>
+      <a href="{% url 'clinica:home_view' %}" class="btn">Cancelar</a>
+    </section>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  // Utilidades
+  const parseMoney = (v) => {
+    if (!v) return 0;
+    // aceita vírgula como decimal
+    return parseFloat(String(v).replace(/\./g, '').replace(',', '.')) || 0;
+  };
+
+  const fmtMoney = (n) => {
+    return (Number(n) || 0).toFixed(2).replace('.', ',');
+  };
+
+  // ================== Tutor & Animal (autocomplete ganchos) ==================
+  // Chame estes métodos nos callbacks do seu autocomplete AJAX.
+
+  // Exemplo de uso no seu JS:
+  //   onTutorSelected({ id: 5, nome: "Fulano" });
+  //   onAnimalSelected({ id: 12, nome: "Rex" });
+
+  window.onTutorSelected = function (tutor) {
+    const tutorIdEl = document.getElementById('tutor-id');
+    const tutorInfoEl = document.getElementById('tutor-selecionado');
+    const animalInput = document.getElementById('animal-input');
+
+    if (tutor && tutor.id) {
+      tutorIdEl.value = tutor.id;
+      tutorInfoEl.textContent = `Tutor selecionado: ${tutor.nome || ('ID ' + tutor.id)}`;
+      animalInput.disabled = false; // libera busca de animal
+      // opcional: limpar animal anterior
+      document.getElementById('animal-id').value = '';
+      document.getElementById('animal-selecionado').textContent = '';
+    } else {
+      tutorIdEl.value = '';
+      tutorInfoEl.textContent = '';
+      animalInput.disabled = true;
+    }
+  };
+
+  window.onAnimalSelected = function (animal) {
+    const animalIdEl = document.getElementById('animal-id');
+    const animalInfoEl = document.getElementById('animal-selecionado');
+    const btnAtendimento = document.getElementById('btn-iniciar-atendimento');
+
+    if (animal && animal.id) {
+      animalIdEl.value = animal.id;
+      animalInfoEl.textContent = `Animal selecionado: ${animal.nome || ('ID ' + animal.id)}`;
+      btnAtendimento.disabled = false;
+    } else {
+      animalIdEl.value = '';
+      animalInfoEl.textContent = '';
+      btnAtendimento.disabled = true;
+    }
+  };
+
+  // ================== Botão Iniciar Atendimento (corrige NoReverseMatch) ==================
+  document.getElementById('btn-iniciar-atendimento').addEventListener('click', function () {
+    const id = document.getElementById('animal-id').value;
+    if (!id) return;
+
+    // URL base com placeholder "0" gerada pelo Django
+    const base = document.getElementById('atendimento-url-base').value; // ex.: /atendimento/novo/0/
+    // substitui o "0" final pelo id real (mantendo possível / no final)
+    const url = base.replace(/0\/?$/, String(id) + '/');
+
+    window.location.href = url;
+  });
+
+  // ================== Itens da venda ==================
+  const itens = []; // {id, nome, tipo, qtd, preco}
+  const tabelaBody = document.querySelector('#tabela-itens tbody');
+  const totalGeralEl = document.getElementById('total-geral');
+  const totalFinalEl = document.getElementById('total-final');
+  const descontoEl = document.getElementById('desconto');
+  const recebidoEl = document.getElementById('valor-recebido');
+  const trocoEl = document.getElementById('troco');
+
+  function renderTabela() {
+    tabelaBody.innerHTML = '';
+    let total = 0;
+
+    itens.forEach((it, idx) => {
+      const subtotal = it.qtd * it.preco;
+      total += subtotal;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${it.nome}</td>
+        <td>${it.tipo || '-'}</td>
+        <td>
+          <input type="number" min="1" step="1" value="${it.qtd}" data-idx="${idx}" class="qtd-item">
+        </td>
+        <td>${fmtMoney(it.preco)}</td>
+        <td>${fmtMoney(subtotal)}</td>
+        <td>
+          <button type="button" class="btn btn-small btn-danger" data-remove="${idx}">Remover</button>
+        </td>
+      `;
+      tabelaBody.appendChild(tr);
+    });
+
+    totalGeralEl.value = fmtMoney(total);
+
+    const desc = parseMoney(descontoEl.value);
+    const final = Math.max(total - desc, 0);
+    totalFinalEl.value = fmtMoney(final);
+
+    const recebido = parseMoney(recebidoEl.value);
+    const troco = Math.max(recebido - final, 0);
+    trocoEl.value = fmtMoney(troco);
+  }
+
+  tabelaBody.addEventListener('input', function (e) {
+    if (e.target.classList.contains('qtd-item')) {
+      const idx = Number(e.target.getAttribute('data-idx'));
+      const val = Math.max(parseInt(e.target.value || '1', 10), 1);
+      itens[idx].qtd = val;
+      renderTabela();
+    }
+  });
+
+  tabelaBody.addEventListener('click', function (e) {
+    const idx = e.target.getAttribute('data-remove');
+    if (idx !== null) {
+      itens.splice(Number(idx), 1);
+      renderTabela();
+    }
+  });
+
+  document.getElementById('desconto').addEventListener('input', renderTabela);
+  document.getElementById('valor-recebido').addEventListener('input', renderTabela);
+
+  // ================== Busca e adição de item (exemplo genérico) ==================
+  // Adapte para seu endpoint de busca. Aqui, simulamos que o item selecionado do autocomplete
+  // chama window.onItemSelected({ id, nome, preco, tipo })
+  window.onItemSelected = function (item) {
+    if (!item || !item.id) return;
+    const qtd = Math.max(parseInt(document.getElementById('quantidade-item').value || '1', 10), 1);
+
+    // Se já existir, soma qtd
+    const idxExistente = itens.findIndex(i => i.id === item.id);
+    if (idxExistente >= 0) {
+      itens[idxExistente].qtd += qtd;
+    } else {
+      itens.push({
+        id: item.id,
+        nome: item.nome,
+        tipo: item.tipo || '',
+        qtd: qtd,
+        preco: Number(item.preco) || 0
+      });
+    }
+    renderTabela();
+    // limpa campo quantidade
+    document.getElementById('quantidade-item').value = 1;
+    // limpa busca se quiser
+    // document.getElementById('busca-item').value = '';
+  };
+
+  // Botão adicionar (útil se você também aceitar adicionar pelo campo atual)
+  document.getElementById('adicionar-item').addEventListener('click', function () {
+    // Aqui você pode, por exemplo, pegar o “item selecionado” da sua lista de sugestões.
+    // Se estiver usando autocomplete, chame `onItemSelected(item)` no clique da sugestão.
+    // Mantive este botão para compatibilidade.
+    const nome = document.getElementById('busca-item').value.trim();
+    if (!nome) return;
+
+    // Exemplo burro: adiciona com preço 0 para demonstrar fluxo (substitua pelo seu retorno real)
+    window.onItemSelected({ id: 'temp-' + Date.now(), nome, preco: 0, tipo: '' });
+  });
+
+  // Render inicial
+  renderTabela();
+})();
+</script>
+{% endblock %}

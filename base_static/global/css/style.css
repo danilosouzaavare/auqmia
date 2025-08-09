@@ -998,3 +998,375 @@ button[type="submit"] {
   /* deixa a fonte menor */
   line-height: 1.2;
 }
+
+
+
+/* Estilos básicos para as sugestões (ajuste ao seu CSS) */
+.suggestions {
+  position: absolute;
+  z-index: 10;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  display: none;
+}
+
+.suggestion-item {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.suggestion-item:hover,
+.suggestion-item:focus {
+  background: #f5f5f5;
+  outline: none;
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-3 {
+  grid-template-columns: 1.2fr 120px 140px;
+  align-items: end;
+}
+
+.align-end {
+  display: flex;
+  align-items: end;
+}
+
+.mt-2 {
+  margin-top: .75rem;
+}
+
+.mt-3 {
+  margin-top: 1.25rem;
+}
+
+.right {
+  text-align: right;
+}
+
+.btn-small {
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.btn-danger {
+  background: #c53030;
+  color: #fff;
+}
+
+.card {
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.muted {
+  color: #777;
+}
+
+.ui-autocomplete {
+  z-index: 3000 !important;
+}
+
+
+
+
+/* =========================
+   NOVA VENDA (escopo local)
+   ========================= */
+.nova-venda h1 {
+  font-size: var(--big-font-size);
+  margin-bottom: 1rem;
+  color: var(--link-dark-color);
+}
+
+.nova-venda .card {
+  background: #fff;
+  border: 1px solid var(--clr-dark-shadow-10);
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: 0 6px 16px var(--clr-dark-shadow-10);
+  margin-bottom: 1.2rem;
+}
+
+/* Grid local */
+.nova-venda .grid {
+  display: grid;
+  gap: 12px;
+}
+
+.nova-venda .grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.nova-venda .grid-3 {
+  grid-template-columns: minmax(0, 1.2fr) 140px 160px;
+  align-items: end;
+}
+
+@media (max-width: 840px) {
+
+  .nova-venda .grid-2,
+  .nova-venda .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Labels e campos */
+.nova-venda label {
+  font-size: 1.2rem;
+  color: #245a2b;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  margin-bottom: .4rem;
+}
+
+.nova-venda .form-control,
+.nova-venda select {
+  width: 100%;
+  background: #fff;
+  color: var(--clr-black);
+  border: 1px solid #b7e0bf;
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.nova-venda .form-control:focus,
+.nova-venda select:focus {
+  outline: none;
+  border-color: var(--link-dark-color);
+  box-shadow: 0 0 0 3px var(--clr-light-shadow-20);
+}
+
+/* Botões (usa tua paleta; padroniza tamanhos) */
+.nova-venda .btn {
+  height: 44px;
+  /* altura consistente */
+  padding: 0 16px;
+  border-radius: 10px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nova-venda .btn-small {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 1.3rem;
+}
+
+/* Variações em cima do teu .btn */
+.nova-venda .btn-primary {
+  background: var(--link-dark-color);
+  color: var(--clr-white);
+}
+
+.nova-venda .btn-secondary {
+  background: #e9f5ee;
+  color: var(--link-dark-color);
+  border: 1px solid #b7e0bf;
+}
+
+.nova-venda .btn-success {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.nova-venda .btn-light {
+  background: #f5fff5;
+  color: var(--link-dark-color);
+  border: 1px solid #b7e0bf;
+}
+
+.nova-venda .btn-danger {
+  background: tomato;
+  color: #fff;
+}
+
+/* Área de ações */
+.nova-venda .actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Tabela de itens */
+.nova-venda .responsive-table {
+  border: 1px solid var(--clr-dark-shadow-10);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.nova-venda .table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: var(--table-min-width);
+}
+
+.nova-venda .table th,
+.nova-venda .table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e6efe6;
+  vertical-align: middle;
+}
+
+.nova-venda .table thead th {
+  background: #f3fbf3;
+  color: #245a2b;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+}
+
+.nova-venda .table tbody tr:hover {
+  background: #f7fcf7;
+}
+
+/* Inputs nos totais */
+.nova-venda #total-geral,
+.nova-venda #total-final,
+.nova-venda #troco {
+  font-weight: 700;
+  height: 40px;
+}
+
+/* Lista de sugestões (você já tem — deixo escopo local se preferir) */
+.nova-venda .suggestions {
+  position: absolute;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  display: none;
+}
+
+.nova-venda .suggestion-item {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.nova-venda .suggestion-item:hover {
+  background: #f5f5f5;
+}
+
+/* jQuery UI autocomplete por cima de tudo */
+.ui-autocomplete {
+  z-index: 3000 !important;
+}
+
+/* Pequenas utilidades locais */
+.nova-venda .mt-2 {
+  margin-top: .75rem;
+}
+
+.nova-venda .mt-3 {
+  margin-top: 1.25rem;
+}
+
+.nova-venda .right {
+  text-align: right;
+}
+
+.nova-venda .muted {
+  color: #6d8f75;
+}
+
+.nova-venda .align-end {
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Ajusta number inputs do grid */
+.nova-venda input[type="number"].form-control {
+  text-align: center;
+}
+
+
+/* ==== Ajustes para página Nova Venda ==== */
+.nova-venda {
+  padding-top: 20px;
+  /* garante distância do header do base.html */
+}
+
+.page-header h1 {
+  margin-top: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Cards */
+.nova-venda .card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Grid */
+.nova-venda .grid {
+  display: grid;
+  gap: 15px;
+}
+
+.nova-venda .grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.nova-venda .grid-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* Botões */
+.nova-venda .btn {
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border-radius: 6px;
+}
+
+.nova-venda .btn-small {
+  padding: 5px 10px;
+  font-size: 0.85rem;
+}
+
+/* Tabela responsiva */
+.nova-venda .responsive-table {
+  overflow-x: auto;
+}
+
+.nova-venda .table th,
+.nova-venda .table td {
+  padding: 8px 10px;
+  font-size: 0.9rem;
+}
+
+.nova-venda .table tfoot td {
+  font-weight: bold;
+}
+
+.nova-venda .table input.form-control {
+  max-width: 120px;
+  text-align: right;
+}
