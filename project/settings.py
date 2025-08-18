@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ✅ Ambiente: altere aqui entre desenvolvimento e produção
 # ================================================================
 
-DEBUG = True  # ⬅️ Altere para False ao enviar para o Render
+DEBUG = False   # ⬅️ Altere para False ao enviar para o Render
 
 # ================================================================
 # ✅ Chave secreta (pode ser sobrescrita por variável de ambiente)
