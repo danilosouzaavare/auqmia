@@ -110,3 +110,17 @@ VacinaAplicadaFormSet = inlineformset_factory(
     extra=1,
     can_delete=True
 )
+
+
+
+
+class VeterinarioForm(forms.ModelForm): 
+    class Meta:
+        model = models.Veterinario
+        fields = ['nome', 'crmv', 'especialidade', 'telefone', 'email']
+
+    def clean_crmv(self):
+        crmv = self.cleaned_data.get('crmv')
+        if not crmv:
+            raise ValidationError("O CRMV é obrigatório.")
+        return crmv

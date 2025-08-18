@@ -1,0 +1,261 @@
+{% load tz %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <title>Resumo do Atendimento</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        body {
+            font-family: DejaVu Sans, Arial, sans-serif;
+            font-size: 12px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .header img {
+            max-height: 60px;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 6px 0 10px;
+            text-align: center;
+        }
+
+        .muted {
+            font-size: 11px;
+            color: #555;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 6px;
+            vertical-align: top;
+        }
+
+        th {
+            text-align: left;
+        }
+
+        .assinatura-wrapper {
+            margin-top: 50px;
+            text-align: right;
+        }
+
+        .assinatura {
+            display: inline-block;
+            text-align: center;
+        }
+
+        .assinatura .linha {
+            border-top: 1px solid #000;
+            width: 250px;
+            margin-bottom: 4px;
+        }
+
+        .nowrap {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        {% if logo_url %}<img src="{{ logo_url }}" alt="Logo"><br>{% endif %}
+        <div class="title">Resumo do Atendimento</div>
+        <div class="muted">{{ clinica_nome }} — {{ clinica_endereco }} — {{ clinica_contato }}</div>
+    </div>
+
+    <!-- Identificação -->
+    <table>
+        <tr>
+            <th style="width:25%;">Nº Atendimento</th>
+            <td style="width:25%;">{{ atendimento.pk }}</td>
+            <th style="width:25%;">Data/Hora</th>
+            <td style="width:25%;">
+                {% if data_hora %}
+                {{ data_hora|localtime|date:"d/m/Y H:i" }}
+                {% else %}
+                <span class="muted">—</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Animal</th>
+            <td>
+                {% if animal %}
+                {{ animal.nome|default:animal }}
+                {% if animal.especie %} — {{ animal.especie }}
+                {% elif animal.get_especie_display %} — {{ animal.get_especie_display }}
+                {% endif %}
+                {% elif atendimento.animal %}
+                {{ atendimento.animal.nome|default:atendimento.animal }}
+                {% if atendimento.animal.especie %} — {{ atendimento.animal.especie }}
+                {% elif atendimento.animal.get_especie_display %} — {{ atendimento.animal.get_especie_display }}
+                {% endif %}
+                {% elif atendimento.pet %}
+                {{ atendimento.pet.nome|default:atendimento.pet }}
+                {% if atendimento.pet.especie %} — {{ atendimento.pet.especie }}
+                {% elif atendimento.pet.get_especie_display %} — {{ atendimento.pet.get_especie_display }}
+                {% endif %}
+                {% elif atendimento.animal_atendido %}
+                {{ atendimento.animal_atendido.nome|default:atendimento.animal_atendido }}
+                {% if atendimento.animal_atendido.especie %} — {{ atendimento.animal_atendido.especie }}
+                {% elif atendimento.animal_atendido.get_especie_display %} — {{
+                atendimento.animal_atendido.get_especie_display }}
+                {% endif %}
+                {% else %}
+                <span class="muted">Não informado</span>
+                {% endif %}
+            </td>
+
+        <tr>
+            <th>Orientações ao tutor</th>
+            <td>
+                {% if atendimento.orientacoes_ao_tutor %}
+                {{ atendimento.orientacoes_ao_tutor|linebreaks }}
+                {% else %}
+                <span class="muted">—</span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Informações do atendimento -->
+    <table>
+        <tr>
+            <th style="width:25%;">Anamnese</th>
+            <td>{{ anamnese|linebreaks }}</td>
+        </tr>
+        <tr>
+            <th>Sintomas</th>
+            <td>{{ sintomas|linebreaks }}</td>
+        </tr>
+        <tr>
+            <th>Diagnóstico</th>
+            <td>{{ diagnostico|linebreaks }}</td>
+        </tr>
+        <tr>
+            <th>Tratamento/Prescrição</th>
+            <td>{{ tratamento|linebreaks }}</td>
+        </tr>
+        <tr>
+            <th>Exames solicitados</th>
+            <td>{{ exames_solicitados|linebreaks }}</td>
+        </tr>
+
+        <!-- Vacinas: tenta várias fontes -->
+        <tr>
+            <th>Vacinas aplicadas</th>
+            <td>
+                {% if vacinas_list %}
+                {% for v in vacinas_list %}
+                {% if v.nome %}
+                - {{ v.nome }}{% if not forloop.last %}<br>{% endif %}
+                {% elif v.vacina and v.vacina.nome %}
+                - {{ v.vacina.nome }}{% if not forloop.last %}<br>{% endif %}
+                {% else %}
+                - {{ v }}{% if not forloop.last %}<br>{% endif %}
+                {% endif %}
+                {% empty %}
+                <span class="muted">Nenhuma registrada</span>
+                {% endfor %}
+                {% elif vacinas %}
+                {% for v in vacinas %}
+                - {{ v }}{% if not forloop.last %}<br>{% endif %}
+                {% empty %}
+                <span class="muted">Nenhuma registrada</span>
+                {% endfor %}
+                {% elif atendimento.vacinas %}
+                {% for v in atendimento.vacinas.all %}
+                {% if v.nome %}
+                - {{ v.nome }}{% if not forloop.last %}<br>{% endif %}
+                {% else %}
+                - {{ v }}{% if not forloop.last %}<br>{% endif %}
+                {% endif %}
+                {% empty %}
+                <span class="muted">Nenhuma registrada</span>
+                {% endfor %}
+                {% else %}
+                <span class="muted">Não informado</span>
+                {% endif %}
+            </td>
+        </tr>
+
+        tr>
+        <th>Orientações ao tutor</th>
+        <td>
+            {% if atendimento.orientacoes_ao_tutor %}
+            {{ atendimento.orientacoes_ao_tutor|linebreaks }}
+            {% else %}
+            <span class="muted">—</span>
+            {% endif %}
+        </td>
+        </tr>
+        <!-- Retorno: cobre diferentes nomes e tipos -->
+        <tr>
+            <th>Retorno</th>
+            <td>
+                {% if retorno %}
+                {{ retorno|date:"d/m/Y" }}{% if retorno|date:"H:i" != "00:00" %} {{ retorno|date:"H:i" }}{% endif %}
+                {% elif data_retorno %}
+                {{ data_retorno|date:"d/m/Y" }}{% if data_retorno|date:"H:i" != "00:00" %} {{ data_retorno|date:"H:i"
+                }}{% endif %}
+                {% elif retorno_data %}
+                {{ retorno_data|date:"d/m/Y" }}{% if retorno_data|date:"H:i" != "00:00" %} {{ retorno_data|date:"H:i"
+                }}{% endif %}
+                {% elif atendimento.retorno %}
+                {{ atendimento.retorno|date:"d/m/Y" }}{% if atendimento.retorno|date:"H:i" != "00:00" %} {{
+                atendimento.retorno|date:"H:i" }}{% endif %}
+                {% elif atendimento.data_retorno %}
+                {{ atendimento.data_retorno|date:"d/m/Y" }}{% if atendimento.data_retorno|date:"H:i" != "00:00" %} {{
+                atendimento.data_retorno|date:"H:i" }}{% endif %}
+                {% elif atendimento.retorno_data %}
+                {{ atendimento.retorno_data|date:"d/m/Y" }}{% if atendimento.retorno_data|date:"H:i" != "00:00" %} {{
+                atendimento.retorno_data|date:"H:i" }}{% endif %}
+                {% else %}
+                <span class="muted">—</span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Rodapé -->
+    <div class="foot">
+        Documento destinado ao tutor. Em caso de dúvidas, entre em contato com a clínica.
+    </div>
+
+    <!-- Assinatura (multiline segura) -->
+    <div class="assinatura-wrapper">
+        <div class="assinatura">
+            <div class="linha"></div>
+            {% if veterinario %}
+            {{ veterinario.nome|default:veterinario }}
+            {% if veterinario.crmv %}
+            — CRMV: {{ veterinario.crmv }}
+            {% endif %}
+            {% else %}
+            <span class="muted">Responsável técnico</span>
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+</html>

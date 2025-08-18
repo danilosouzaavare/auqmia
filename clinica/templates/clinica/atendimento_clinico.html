@@ -5,41 +5,164 @@
 <div class="atendimento-container">
     <h2 class="text-center mb-4">Atendimento Clínico - {{ animal.nome }}</h2>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+
         <ul class="nav nav-tabs" id="tabs">
-            <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#dados">Dados Clínicos</a></li>
-            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#vacinas">Vacinas Aplicadas</a></li>
-            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#final">Finalização</a></li>
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#dados">Dados Clínicos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#vacinas">Vacinas Aplicadas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#final">Finalização</a>
+            </li>
         </ul>
 
         <div class="tab-content p-3 border border-top-0 bg-white rounded shadow-sm">
+            {# --- DADOS CLÍNICOS --- #}
             <div class="tab-pane fade show active" id="dados">
-                {{ form.anamnese.label }} {{ form.anamnese }}
-                {{ form.sintomas.label }} {{ form.sintomas }}
-                {{ form.diagnostico.label }} {{ form.diagnostico }}
-                {{ form.tratamento.label }} {{ form.tratamento }}
-                {{ form.exames_solicitados.label }} {{ form.exames_solicitados }}
+                <div class="mb-2">
+                    <label>{{ form.anamnese.label }}</label>
+                    {{ form.anamnese }}
+                    {% for error in form.anamnese.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-2">
+                    <label>{{ form.sintomas.label }}</label>
+                    {{ form.sintomas }}
+                    {% for error in form.sintomas.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-2">
+                    <label>{{ form.diagnostico.label }}</label>
+                    {{ form.diagnostico }}
+                    {% for error in form.diagnostico.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-2">
+                    <label>{{ form.tratamento.label }}</label>
+                    {{ form.tratamento }}
+                    {% for error in form.tratamento.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-2">
+                    <label>{{ form.exames_solicitados.label }}</label>
+                    {{ form.exames_solicitados }}
+                    {% for error in form.exames_solicitados.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
             </div>
+
+            {# --- VACINAS (FORMSET) --- #}
             <div class="tab-pane fade" id="vacinas">
                 {{ formset.management_form }}
-                {% for form in formset %}
+                {% if formset.non_form_errors %}
+                <div class="alert alert-danger">
+                    {% for e in formset.non_form_errors %}
+                    <div>{{ e }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% for vform in formset %}
                 <div class="card my-2 p-2">
-                    {{ form.vacina.label }} {{ form.vacina }}
-                    {{ form.dosagem.label }} {{ form.dosagem }}
-                    {{ form.observacoes.label }} {{ form.observacoes }}
+                    <div class="mb-2">
+                        <label>{{ vform.vacina.label }}</label>
+                        {{ vform.vacina }}
+                        {% for error in vform.vacina.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-2">
+                        <label>{{ vform.dosagem.label }}</label>
+                        {{ vform.dosagem }}
+                        {% for error in vform.dosagem.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-2">
+                        <label>{{ vform.observacoes.label }}</label>
+                        {{ vform.observacoes }}
+                        {% for error in vform.observacoes.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
                 </div>
                 {% endfor %}
             </div>
+
+            {# --- FINALIZAÇÃO --- #}
             <div class="tab-pane fade" id="final">
-                {{ form.orientacoes_ao_tutor.label }} {{ form.orientacoes_ao_tutor }}
-                {{ form.retorno_recomendado.label }} {{ form.retorno_recomendado }}
-                {{ form.data_retorno.label }} {{ form.data_retorno }}
-                {{ form.venda_gerada.label }} {{ form.venda_gerada }}
+                <div class="mb-2">
+                    <label>{{ form.orientacoes_ao_tutor.label }}</label>
+                    {{ form.orientacoes_ao_tutor }}
+                    {% for error in form.orientacoes_ao_tutor.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-2">
+                    <label>{{ form.retorno_recomendado.label }}</label>
+                    {{ form.retorno_recomendado }}
+                    {% for error in form.retorno_recomendado.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-2">
+                    <label>{{ form.data_retorno.label }}</label>
+                    {{ form.data_retorno }}
+                    {% for error in form.data_retorno.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-2">
+                    <label>{{ form.venda_gerada.label }}</label>
+                    {{ form.venda_gerada }}
+                    {% for error in form.venda_gerada.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
 
+        {# Botão de PDF: só aparece quando existir atendimento #}
+        {% if atendimento and atendimento.pk %}
+        <a href="{% url 'clinica:atendimento_resumo_pdf' atendimento.pk %}"
+            class="btn btn-outline-secondary btn-sm mt-3">
+            Baixar resumo (PDF)
+        </a>
+        {% else %}
+        <button type="button" class="btn btn-outline-secondary btn-sm mt-3" disabled
+            title="Salve o atendimento antes de gerar o PDF">
+            Baixar resumo (PDF)
+        </button>
+        {% endif %}
+
         <button type="submit" class="btn btn-primary mt-3">Salvar Atendimento</button>
+
+        {# Erros agregados do form principal (após os campos para ajudar) #}
+        {% if form.errors or form.non_field_errors or formset.non_form_errors %}
+        <div class="alert alert-danger mt-3">
+            <strong>Corrija os erros abaixo:</strong>
+            {{ form.non_field_errors }}
+            {% if formset.non_form_errors %}
+            <div>{{ formset.non_form_errors }}</div>
+            {% endif %}
+            <ul class="mb-0">
+                {% for field in form %}
+                {% for error in field.errors %}
+                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
     </form>
 </div>
 {% endblock %}
