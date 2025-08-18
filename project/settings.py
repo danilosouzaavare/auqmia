@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ✅ Ambiente: altere aqui entre desenvolvimento e produção
 # ================================================================
 
-DEBUG = False   # ⬅️ Altere para False ao enviar para o Render
+#DEBUG = True   # ⬅️ Altere para False ao enviar para o Render
 
 # ================================================================
 # ✅ Chave secreta (pode ser sobrescrita por variável de ambiente)
@@ -35,12 +35,23 @@ SECRET_KEY = os.environ.get(
 # ✅ Hosts permitidos
 # ================================================================
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-if not DEBUG:
-    RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-    if RENDER_EXTERNAL_HOSTNAME:
-        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+DEBUG = os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
 
+if DEBUG:
+    # Ambiente de desenvolvimento (local)
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+else:
+    # Ambiente de produção (Render)
+    ALLOWED_HOSTS = [
+        "auqmia.onrender.com",  # seu domínio no Render
+        ".onrender.com",        # qualquer subdomínio do Render
+    ]
+
+    # Também configure CSRF em produção
+    CSRF_TRUSTED_ORIGINS = [
+        "https://auqmia.onrender.com",
+        "https://*.onrender.com",
+    ]
 # ================================================================
 # ✅ Aplicativos instalados
 # ================================================================
